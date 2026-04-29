@@ -9,6 +9,7 @@ def home():
 
 @app.route("/pdf", methods=["POST"])
 def pdf():
+
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"})
 
@@ -19,12 +20,13 @@ def pdf():
 
         with pdfplumber.open(file) as pdf:
             for page in pdf.pages:
-                text_all += page.extract_text() + "\n"
+                text = page.extract_text()
+                if text:
+                    text_all += text + "\n"
 
-        # とりあえずテキスト返す（後で時間割に変換する）
         return jsonify({
             "success": True,
-            "text": text_all[:2000]  # 長すぎ防止
+            "text": text_all
         })
 
     except Exception as e:
