@@ -23,7 +23,7 @@ def pdf():
 
         with pdfplumber.open(file.stream) as pdf:
             for i, page in enumerate(pdf.pages):
-                if i >= 8:
+                if i >= 12:
                     break
 
                 text = page.extract_text()
