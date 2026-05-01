@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import pdfplumber
+import traceback
 
 app = Flask(__name__)
 
@@ -9,16 +10,18 @@ def home():
 
 @app.route("/pdf", methods=["POST"])
 def pdf():
-
-    if "file" not in request.files:
-        return jsonify({"error": "No file uploaded"})
-
-    file = request.files["file"]
-
     try:
+        if "file" not in request.files:
+            return jsonify({
+                "success": False,
+                "error": "No file uploaded"
+            }), 400
+
+        file = request.files["file"]
+
         text_all = ""
 
-        with pdfplumber.open(file) as pdf:
+        with pdfplumber.open(file.stream) as pdf:
             for page in pdf.pages:
                 text = page.extract_text()
                 if text:
@@ -32,5 +35,6 @@ def pdf():
     except Exception as e:
         return jsonify({
             "success": False,
-            "error": str(e)
-        })
+            "error": str(e),
+            "trace": traceback.format_exc()
+        }), 200
